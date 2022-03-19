@@ -5,6 +5,7 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
@@ -58,5 +59,31 @@ void main() {
     await tester.tap(taskItem);
     await tester.pump();
     verify(onRemove('Task 1')).called(1);
+  });
+  testWidgets('Should reorder the collection of tasks',
+      (WidgetTester tester) async {
+    final onReorder = OnReorderMockFunction();
+    final tasks = ['Task 1', 'Task 2', 'Task 3'];
+    final tasksWidget =
+        TaskList(tasks: tasks, onRemove: () {}, onReorder: onReorder);
+    await tester.pumpWidget(MaterialApp(
+      home: Material(
+        child: Directionality(
+          textDirection: TextDirection.ltr,
+          child: Center(
+            child: tasksWidget,
+          ),
+        ),
+      ),
+    ));
+    expect(tasksWidget.tasks, orderedEquals(['Task 1', 'Task 2', 'Task 3']));
+    final TestGesture drag =
+        await tester.startGesture(tester.getCenter(find.text('Task 1')));
+    await tester.pump(kLongPressTimeout + kPressTimeout);
+    await drag.moveTo(tester.getTopLeft(find.text('Task 3')));
+    await drag.up();
+    await tester.pumpAndSettle();
+    expect(tasksWidget.tasks, orderedEquals(['Task 2', 'Task 3', 'Task 1']));
+    verify(onReorder()).called(1);
   });
 }
