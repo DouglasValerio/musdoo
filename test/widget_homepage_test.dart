@@ -1,10 +1,3 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility that Flutter provides. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:musdoo/pages/homepage.dart';
@@ -28,6 +21,19 @@ void main() {
       ));
       expect(find.byWidgetPredicate((widget) => widget is FloatingActionButton),
           findsOneWidget);
+    });
+    testWidgets('Should call add task on tap Floating Action Button',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(const MaterialApp(
+        home: Material(child: Homepage(title: 'Some random title')),
+      ));
+
+      final floatingButton = find.byIcon(Icons.add);
+      await tester.ensureVisible(floatingButton);
+      await tester.pump();
+      await tester.tap(floatingButton);
+      await tester.pump();
+      expect(find.text('Task 1'), findsOneWidget);
     });
   });
 }

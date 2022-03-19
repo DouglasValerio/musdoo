@@ -11,9 +11,15 @@ class Homepage extends StatefulWidget {
   State<Homepage> createState() => _HomepageState();
 }
 
-void _addNewTask() {}
-
 class _HomepageState extends State<Homepage> {
+  final List<String> _tasks = [];
+  void _addNewTask() {
+    final String task = 'Task ${_tasks.length + 1}';
+    setState(() {
+      _tasks.add(task);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,7 +27,7 @@ class _HomepageState extends State<Homepage> {
         title: Text(widget.title),
       ),
       body: SizedBox(
-        child: TaskList(tasks: const [], onRemove: () {}, onReorder: () {}),
+        child: TaskList(tasks: _tasks, onRemove: () {}, onReorder: () {}),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
