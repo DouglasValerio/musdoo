@@ -29,6 +29,8 @@ class Homepage extends StatefulWidget {
   State<Homepage> createState() => _HomepageState();
 }
 
+void _addNewTask() {}
+
 class _HomepageState extends State<Homepage> {
   @override
   Widget build(BuildContext context) {
@@ -42,7 +44,9 @@ class _HomepageState extends State<Homepage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          _addNewTask();
+        },
         tooltip: 'Add task',
         child: const Icon(Icons.add),
       ),
