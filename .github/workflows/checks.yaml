@@ -17,3 +17,6 @@ jobs:
       - run: flutter pub get
       - run: flutter analyze
       - run: flutter test 
+      - uses: codecov/codecov-action@v1
+        with:
+          file: ./coverage/lcov.info
