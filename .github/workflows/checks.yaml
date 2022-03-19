@@ -16,7 +16,11 @@ jobs:
           channel: 'stable'
       - run: flutter pub get
       - run: flutter analyze
-      - run: flutter test 
-      - uses: codecov/codecov-action@v1
+      - name: Run tests with coverage
+        run: pub run test --coverage="coverage"
+      - name: Convert coverage to ICOV
+        run: pub run coverage:format_coverage --lcov --in=coverage --out=coverage.lcov --packages=.packages --report-on=lib
+      - name: Upload coverage to Codecov  
+        uses: codecov/codecov-action@v1.0.2
         with:
-          file: ./coverage/lcov.info
+          file: coverage.lcov
