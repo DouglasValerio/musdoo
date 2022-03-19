@@ -12,11 +12,11 @@ class MusdooApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Musdoo app',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const Homepage(title: 'My Goals'),
+      home: const Homepage(title: 'Tarefas'),
     );
   }
 }
@@ -39,14 +39,8 @@ class _HomepageState extends State<Homepage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text('Tarefas'),
-            TaskList(tasks: const [], onRemove: () {}, onReorder: () {}),
-          ],
-        ),
+      body: SizedBox(
+        child: TaskList(tasks: const [], onRemove: () {}, onReorder: () {}),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
