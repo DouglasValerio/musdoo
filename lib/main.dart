@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:musdoo/task_list.dart';
 
 void main() {
   runApp(const MusdooApp());
@@ -41,6 +42,10 @@ class _HomepageState extends State<Homepage> {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text('Tarefas'),
+            TaskList(tasks: const [], onRemove: () {}, onReorder: () {}),
+          ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
