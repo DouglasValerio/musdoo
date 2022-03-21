@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'pages/homepage.dart';
 
@@ -16,6 +17,9 @@ class MusdooApp extends StatelessWidget {
       title: 'Musdoo app',
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        textTheme: GoogleFonts.ralewayTextTheme(
+          Theme.of(context).textTheme,
+        ),
       ),
       home: const Homepage(title: 'Tarefas'),
     );

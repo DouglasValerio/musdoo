@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:musdoo/pages/homepage.dart';
-import 'package:musdoo/task_list.dart';
+import 'package:musdoo/widgets/add_task_widget.dart';
+import 'package:musdoo/widgets/task_list.dart';
 
 void main() {
   group('Homepage', () {
@@ -22,7 +23,7 @@ void main() {
       expect(find.byWidgetPredicate((widget) => widget is FloatingActionButton),
           findsOneWidget);
     });
-    testWidgets('Should call add task on tap Floating Action Button',
+    testWidgets('Should show bottom modal when tap on FloatingButton',
         (WidgetTester tester) async {
       await tester.pumpWidget(const MaterialApp(
         home: Material(child: Homepage(title: 'Some random title')),
@@ -32,8 +33,9 @@ void main() {
       await tester.ensureVisible(floatingButton);
       await tester.pump();
       await tester.tap(floatingButton);
-      await tester.pump();
-      expect(find.text('Task 1'), findsOneWidget);
+      await tester.pumpAndSettle();
+      expect(find.byWidgetPredicate((widget) => widget is AddTaskModal),
+          findsOneWidget);
     });
   });
 }

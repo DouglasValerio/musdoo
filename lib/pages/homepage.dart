@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:musdoo/model/task_model.dart';
 
-import '../task_list.dart';
+import '../widgets/add_task_widget.dart';
+import '../widgets/task_list.dart';
 
 class Homepage extends StatefulWidget {
   const Homepage({Key? key, required this.title}) : super(key: key);
@@ -12,12 +14,23 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomepageState extends State<Homepage> {
-  final List<String> _tasks = [];
+  final List<TaskModel> _tasks = [];
   void _addNewTask() {
-    final String task = 'Task ${_tasks.length + 1}';
-    setState(() {
-      _tasks.add(task);
-    });
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+            topRight: Radius.circular(24), topLeft: Radius.circular(24)),
+      ),
+      builder: (context) => AddTaskModal(
+        key: const Key('add_widget_modal'),
+        onAdded: (task) {
+          setState(() {
+            _tasks.add(task);
+          });
+        },
+      ),
+    );
   }
 
   @override
@@ -27,7 +40,14 @@ class _HomepageState extends State<Homepage> {
         title: Text(widget.title),
       ),
       body: SizedBox(
-        child: TaskList(tasks: _tasks, onRemove: () {}, onReorder: () {}),
+        child: TaskList(
+          tasks: _tasks,
+          onRemove: (i) {
+            setState(() {
+              _tasks.removeAt(i);
+            });
+          },
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {

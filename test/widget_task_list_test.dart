@@ -1,36 +1,35 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility that Flutter provides. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
+import 'package:musdoo/model/task_model.dart';
 
-import 'package:musdoo/task_list.dart';
+import 'package:musdoo/widgets/task_list.dart';
 
 class OnRemoveMockFunction extends Mock {
-  void call(String task);
-}
-
-class OnReorderMockFunction extends Mock {
-  void call();
+  void call(int i);
 }
 
 void main() {
   group('TaskList', () {
     testWidgets('Should render the collection of tasks',
         (WidgetTester tester) async {
-      const tasks = ['Task 1', 'Task 2', 'Task 3'];
+      final tasks = [
+        TaskModel(
+            title: 'Task 1', description: 'description', status: 'status'),
+        TaskModel(
+            title: 'Task 2', description: 'description', status: 'status'),
+        TaskModel(
+            title: 'Task 3', description: 'description', status: 'status'),
+      ];
       await tester.pumpWidget(MaterialApp(
         home: Material(
           child: Directionality(
             textDirection: TextDirection.ltr,
             child: Center(
-              child: TaskList(tasks: tasks, onRemove: () {}, onReorder: () {}),
+              child: TaskList(
+                tasks: tasks,
+                onRemove: (i) {},
+              ),
             ),
           ),
         ),
@@ -41,49 +40,29 @@ void main() {
     });
   });
   testWidgets('Should call the onRemove function', (WidgetTester tester) async {
-    const tasks = ['Task 1', 'Task 2', 'Task 3'];
+    final tasks = [
+      TaskModel(title: 'Task 1', description: 'description', status: 'status')
+    ];
     final onRemove = OnRemoveMockFunction();
     await tester.pumpWidget(MaterialApp(
       home: Material(
         child: Directionality(
           textDirection: TextDirection.ltr,
           child: Center(
-            child: TaskList(tasks: tasks, onRemove: onRemove, onReorder: () {}),
+            child: TaskList(
+              tasks: tasks,
+              onRemove: onRemove,
+            ),
           ),
         ),
       ),
     ));
-    verifyNever(onRemove('Task 1'));
-    final taskItem = find.text('Task 1');
-    expect(taskItem, findsOneWidget);
-    await tester.tap(taskItem);
+    verifyNever(onRemove(0));
+    final removeTaskButton =
+        find.byWidgetPredicate((widget) => widget is TextButton);
+    expect(removeTaskButton, findsOneWidget);
+    await tester.tap(removeTaskButton);
     await tester.pump();
-    verify(onRemove('Task 1')).called(1);
-  });
-  testWidgets('Should reorder the collection of tasks',
-      (WidgetTester tester) async {
-    final onReorder = OnReorderMockFunction();
-    final tasks = ['Task 1', 'Task 2', 'Task 3'];
-    final tasksWidget =
-        TaskList(tasks: tasks, onRemove: () {}, onReorder: onReorder);
-    await tester.pumpWidget(MaterialApp(
-      home: Material(
-        child: Directionality(
-          textDirection: TextDirection.ltr,
-          child: Center(
-            child: tasksWidget,
-          ),
-        ),
-      ),
-    ));
-    expect(tasksWidget.tasks, orderedEquals(['Task 1', 'Task 2', 'Task 3']));
-    final TestGesture drag =
-        await tester.startGesture(tester.getCenter(find.text('Task 1')));
-    await tester.pump(kLongPressTimeout + kPressTimeout);
-    await drag.moveTo(tester.getTopLeft(find.text('Task 3')));
-    await drag.up();
-    await tester.pumpAndSettle();
-    expect(tasksWidget.tasks, orderedEquals(['Task 2', 'Task 3', 'Task 1']));
-    verify(onReorder()).called(1);
+    verify(onRemove(0)).called(1);
   });
 }
