@@ -32,6 +32,7 @@ platform :android do
 
   desc "Deploy a new version to the Google Play"
   lane :deploy do
+    supply(track: "alpha", aab:"../build/app/outputs/bundle/release/app-release.aab")
     upload_to_play_store
   end
 
@@ -39,10 +40,10 @@ platform :android do
   lane :distribute_android_app do
       firebase_app_distribution(
           app: ENV["FIREBASE_APP_ID_ANDROID"],
-          testers: "<<YOUR_MAIL_ID>>",
-          release_notes_file: "<<PATH_TO_RELEASE_NOTES_FLE>>",
+          testers: "dglvalerio@gmail.com",
+          release_notes_file: "./release_notes.txt",
           android_artifact_type: "APK",
-          android_artifact_path: "<<PATH_TO_APK>>",
+          android_artifact_path: "../build/app/outputs/apk/release/app-release.apk",
           service_credentials_file: "firebase_musdoo_credentials.json"
       )
   end
