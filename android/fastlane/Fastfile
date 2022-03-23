@@ -30,10 +30,9 @@ platform :android do
     # You can also use other beta testing services here
   end
 
-  desc "Deploy a new version to the Google Play"
+  desc "Deploy a new version to the Google Play Internal Test"
   lane :deploy do
-    supply(track: "alpha", aab:"../build/app/outputs/bundle/release/app-release.aab")
-    upload_to_play_store
+    upload_to_play_store(track:"internal", release_status:"draft", aab:"../build/app/outputs/bundle/release/app-release.aab")
   end
 
   desc "Upload Android App to Firebase"
