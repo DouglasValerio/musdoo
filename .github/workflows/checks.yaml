@@ -32,3 +32,45 @@ jobs:
       - uses: codecov/codecov-action@v1
         with:
           file: ./coverage/lcov.info
+  build-deploy:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: '8'
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+      - name: Install Android Gems
+        working-directory: ${{ github.workspace }}/android
+        run: bundle install
+
+      - name: Flutter get
+        working-directory: ${{ github.workspace }}
+        run: flutter pub get
+
+      - name: Decode Keystore
+        run: echo "${{ secrets.KEYSTORE }}" | base64 --decode > ${{ github.workspace }}/android/musdoo-keystore.jks
+      - name: Decode play Store Key
+        run: echo "${{ secrets.PLAY_STORE_KEY }}" | base64 --decode > ${{ github.workspace }}/android/play_store.json
+
+      - name: Set up key.properties
+        working-directory: ${{ github.workspace }}
+        run: |
+          echo keyPassword=\${{ secrets.SIGNING_STORE_PASSWORD }} > ${{env.PROPERTIES_PATH}}
+          echo storePassword=\${{ secrets.SIGNING_KEY_PASSWORD }} >> ${{env.PROPERTIES_PATH}}
+          echo keyAlias=\${{ secrets.SIGNING_KEY_ALIAS }} >> ${{env.PROPERTIES_PATH}}
+        env:
+          PROPERTIES_PATH: "${{ github.workspace }}/android/key.properties"
+
+      - name: Build Appbundle
+        working-directory: ${{ github.workspace }}
+        run: flutter build appbundle --release
+
+      - name: Distribute Android to Play Store
+        working-directory: ${{ github.workspace }}/android
+        run: bundle exec fastlane distribute_app_store
