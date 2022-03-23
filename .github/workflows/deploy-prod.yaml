@@ -1,4 +1,4 @@
-name: Run analyze and tests
+name: Run analyze, tests, build & deploy
 on:
   push:
     branches:    
@@ -33,6 +33,7 @@ jobs:
         with:
           file: ./coverage/lcov.info
   build-deploy:
+    needs: test
     runs-on: macos-latest
     steps:
       - name: Checkout code
