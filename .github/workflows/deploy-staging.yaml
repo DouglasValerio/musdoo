@@ -1,38 +1,10 @@
-name: Run analyze and tests
+name: deploy-staging
 on:
   push:
-    branches:    
-      - 'main'
+    branches:
+      - develop
 jobs:
-  analyze:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-      - uses: actions/setup-java@v1
-        with:
-          java-version: '12.x'
-      - uses: subosito/flutter-action@v1
-        with:
-          channel: 'stable'
-      - run: flutter pub get
-      - run: flutter analyze
-  test:
-    needs: analyze
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-      - uses: actions/setup-java@v1
-        with:
-          java-version: '12.x'
-      - uses: subosito/flutter-action@v1
-        with:
-          channel: 'stable'
-      - run: flutter pub get
-      - run: flutter test --coverage
-      - uses: codecov/codecov-action@v1
-        with:
-          file: ./coverage/lcov.info
-  build-deploy:
+  build_apk:
     runs-on: macos-latest
     steps:
       - name: Checkout code
@@ -55,8 +27,6 @@ jobs:
 
       - name: Decode Keystore
         run: echo "${{ secrets.KEYSTORE }}" | base64 --decode > ${{ github.workspace }}/android/musdoo-keystore.jks
-      - name: Decode play Store Key
-        run: echo "${{ secrets.PLAY_STORE_KEY }}" | base64 --decode > ${{ github.workspace }}/android/play_store.json
 
       - name: Set up key.properties
         working-directory: ${{ github.workspace }}
@@ -67,10 +37,19 @@ jobs:
         env:
           PROPERTIES_PATH: "${{ github.workspace }}/android/key.properties"
 
-      - name: Build Appbundle
+      - name: Build APK
         working-directory: ${{ github.workspace }}
-        run: flutter build appbundle --release
+        run: flutter build apk
 
-      - name: Distribute Android to Play Store
+      - name: Create Firebase Service Credentials file
+        run: |
+          echo "$FIREBASE_CREDENTIALS" > firebase_credentials.json.b64
+          base64 -d -i firebase_credentials.json.b64 > "${{ github.workspace }}/android/firebase_musdoo_credentials.json"
+        env:
+          FIREBASE_CREDENTIALS: ${{ secrets.FIREBASE_CREDENTIALS }}
+
+      - name: Distribute Android Beta App
         working-directory: ${{ github.workspace }}/android
-        run: bundle exec fastlane distribute_app_store
+        run: bundle exec fastlane distribute_android_app
+        env:
+          FIREBASE_APP_ID_ANDROID: ${{ secrets.FIREBASE_APP_ID_ANDROID }}
